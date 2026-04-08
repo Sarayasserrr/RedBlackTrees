@@ -1,6 +1,3 @@
-import random
-from xml.dom.minidom import ProcessingInstruction
-
 
 class Node:
     def __init__(self, data): #every node in the tree is an object
@@ -61,10 +58,13 @@ class RedBlackTree:
     def fix_insert(self, node):
 #after inserting 3shan nesala7 el tree law fe moshkela
 
-        while node != self.root and node.parent.color == "red":
+        while node != self.root and node.parent and node.parent.color == "red":
 
             parent = node.parent
             grand = parent.parent
+
+            if grand is None:
+                break
 
             #parent on the left
             if parent == grand.left:
@@ -179,44 +179,78 @@ class RedBlackTree:
             return 0
         return 1 + max(self.get_height(node.left), self.get_height(node.right))
 
-    #black height
+    #black height(edited)
     def get_black_height(self, node):
-        count = 0
-        while node:
-            if node.color == "black":
-                count += 1
-            node = node.left
-        return count
+       if node is None:
+           return 0
+       left_bh= self.get_black_height(node.left)
 
-#testing by using randoms
-tree = RedBlackTree()
-for _ in range(20):
-    x = random.randint(1, 100)
-    print(f"Inserting {x}")
-    tree.insert(x)
+       if node.color == "black":
+           return left_bh + 1
+       else:
+           return left_bh
 
-print("\nFinal:")
-print("Size:", tree.get_size(tree.root))
-print("Height:", tree.get_height(tree.root))
-print("Black Height:", tree.get_black_height(tree.root))
 
-print("\n--------------------------------------------")
+#load dictionary
+def load_dictionary(tree):
+    try:
+        with open ("dictionary.txt", "r") as f:
+            for line in f:
+                word = line.strip()
+                if word:
+                    tree.insert(word)
+    except:
+        print("ERROR: File not found")
 
-#testing every case b wodou7
-if __name__ == "__main__":
+#insert word
+def insert_word (tree, word):
+    if tree.search(tree.root, word):
+        print("\033[91m Error: word already existed.\033[0m")
+        return
+    tree.insert(word)
+
+    with open("dictionary.txt", "a") as f:
+        f.write(word + "\n")
+
+    print("word " + word + " is inserted successfully")
+    print("Size: " , tree.get_size(tree.root))
+    print("Height: " , tree.get_height(tree.root))
+    print("Black Height: " , tree.get_black_height(tree.root))
+
+#look up word
+def lookup(tree, word):
+    if tree.search(tree.root, word):
+        print("\033[92m YES\033[0m")
+        print("Size: ", tree.get_size(tree.root))
+        print("Height: ", tree.get_height(tree.root))
+        print("Black Height: ", tree.get_black_height(tree.root))
+    else:
+        print("\033[91m NO\033[0m")
+
+#Main UI
+def main():
     tree = RedBlackTree()
-    # test insertions
-    values = [41, 38, 31, 12, 15, 8, 45, 39]
+    load_dictionary(tree)
 
-    for v in values:
-        print(f"\nInserting {v}...")
-        tree.insert(v)
+    while True:
+        print("\033[96m****Menu****\033[0m")
+        print("1) insert word")
+        print("2) search word")
+        print("3) exit")
 
-        print("Size:", tree.get_size(tree.root))
-        print("Height:", tree.get_height(tree.root))
-        print("Black Height:", tree.get_black_height(tree.root))
-print("\nSearch Test:")
-print("Find 15:", "YES" if tree.search(tree.root, 15) else "NO")
-print("Find 100:", "YES" if tree.search(tree.root, 100) else "NO")
-print("\nTry inserting duplicate:")
-tree.insert(15)
+        try:
+         choice = int(input("Enter your choice: "))
+        except:
+         print("\033[91m ERROR\033[0m")
+         continue
+        if choice == 1:
+             word = input("Enter your word: ")
+             insert_word(tree, word)
+        elif choice == 2:
+             word = input("Enter your word: ")
+             lookup(tree, word)
+        elif choice == 3:
+          break
+
+if __name__ == "__main__":
+    main()
