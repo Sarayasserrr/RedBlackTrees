@@ -195,68 +195,6 @@ class RedBlackTree:
         else:
             return left_bh
 
-    # print tree
-    def print_tree_pretty(self):
-        if not self.root:
-            print("Tree is empty")
-            return
-
-        RED = "\033[91m"
-        BLACK = "\033[90m"
-        RESET = "\033[0m"
-
-        # Collect levels
-        levels = []
-        current_level = [self.root]
-        while any(node is not None for node in current_level):
-            levels.append(current_level)
-            next_level = []
-            for node in current_level:
-                if node:
-                    next_level.append(node.left)
-                    next_level.append(node.right)
-                else:
-                    next_level.append(None)
-                    next_level.append(None)
-            current_level = next_level
-
-        # KEY FIX: cell width based on longest word in tree
-        max_len = max(
-            len(str(node.data))
-            for level in levels
-            for node in level
-            if node is not None
-        )
-        cell = max_len + 2  # +2 padding so words don't touch
-
-        for i, level in enumerate(levels):
-            # Print node values
-            node_line = ""
-            for node in level:
-                if node:
-                    color = RED if node.color == "red" else BLACK
-                    node_line += f"{color}{str(node.data):^{cell}}{RESET}"
-                else:
-                    node_line += " " * cell
-            print(node_line)
-
-            # Print slash connectors
-            if i < len(levels) - 1:
-                slash_line = ""
-                next_level = levels[i + 1]
-                half = cell // 2
-
-                for j, node in enumerate(level):
-                    left_child = next_level[j * 2] if j * 2 < len(next_level) else None
-                    right_child = next_level[j * 2 + 1] if j * 2 + 1 < len(next_level) else None
-
-                    cell_chars = list(" " * cell)
-                    if left_child and half - 1 >= 0:    cell_chars[half - 1] = "/"
-                    if right_child and half + 1 < cell:  cell_chars[half + 1] = "\\"
-
-                    slash_line += "".join(cell_chars)
-
-                print(slash_line)
 
 #load dictionary
 def load_dictionary(tree):
@@ -303,7 +241,6 @@ def main():
         print("1) insert word")
         print("2) search word")
         print("3) exit")
-        print("4)display tree")
 
         try:
          choice = int(input("Enter your choice: "))
@@ -316,8 +253,6 @@ def main():
         elif choice == 2:
              word = input("Enter your word: ")
              lookup(tree, word)
-        elif choice == 4:
-            tree.print_tree_pretty()
         elif choice == 3:
           break
 
